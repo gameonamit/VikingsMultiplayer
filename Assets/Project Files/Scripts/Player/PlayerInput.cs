@@ -9,6 +9,8 @@ public class PlayerInput : MonoBehaviour
     public bool sprint;
     public bool attack;
     public bool heavyAttack;
+    public bool block;
+    public bool dodge;
 
     // Update is called once per frame
     void Update()
@@ -24,5 +26,11 @@ public class PlayerInput : MonoBehaviour
 
         if (Input.GetButtonDown("Fire2")) heavyAttack = true;
         if (Input.GetButtonUp("Fire2")) heavyAttack = false;
+
+        if (Input.GetButtonDown("Block")) block = true;
+        if (Input.GetButtonUp("Block")) block = false;
+
+        if (Input.GetButtonDown("Dodge")) dodge = true;
+        if (Input.GetButtonUp("Dodge")) dodge = false;
     }
 }

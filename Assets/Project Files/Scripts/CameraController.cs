@@ -6,7 +6,8 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] private Transform target;
     [SerializeField] private float CameraMoveSpeed = 120f;
-    [SerializeField] private float clampAngle = 80.0f;
+    [SerializeField] private float minClampAngle = -80.0f;
+    [SerializeField] private float maxClampAngle = 80.0f;
     [SerializeField] private float inputSensitivity = 150.0f;
     private float mouseX, mouseY;
     private float rotY = 0.0f;
@@ -35,7 +36,7 @@ public class CameraController : MonoBehaviour
         rotY += mouseX * inputSensitivity * Time.deltaTime;
         rotX += mouseY * inputSensitivity * Time.deltaTime;
 
-        rotX = Mathf.Clamp(rotX, -clampAngle, clampAngle);
+        rotX = Mathf.Clamp(rotX, minClampAngle, maxClampAngle);
 
         Quaternion localRotation = Quaternion.Euler(rotX, rotY, 0.0f);
         transform.rotation = localRotation;

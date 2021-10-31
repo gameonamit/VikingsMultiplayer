@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Camera mainCamera;
     private PlayerInput playerInput;
+    private PlayerAttack playerAttack;
 
     private Vector3 forceDirection = Vector3.zero;
     private Vector2 inputDirection;
@@ -28,12 +29,14 @@ public class PlayerController : MonoBehaviour
         mainCamera = Camera.main;
         rb = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
+        playerAttack = GetComponent<PlayerAttack>();
     }
 
     private void FixedUpdate()
     {
         CalculateDirection();
         ApplyMovement();
+
         GravityModifier();
         LookAt();
     }
@@ -77,44 +80,59 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        if (inputDirection.sqrMagnitude > 0.1f)
+        if (playerAttack.attacking == false && playerAttack.blocking == false && playerAttack.dodging == false)
         {
-            rb.AddForce(forceDirection, ForceMode.Impulse);
-            forceDirection = Vector3.zero;
+            if (inputDirection.sqrMagnitude > 0.1f)
+            {
+                rb.AddForce(forceDirection, ForceMode.Impulse);
+                forceDirection = Vector3.zero;
 
-            Vector3 horizontalVelocity = rb.velocity;
-            horizontalVelocity.y = 0;
-            if (playerInput.sprint == false)
-            {
-                if (horizontalVelocity.sqrMagnitude > normalSpeed * normalSpeed)
+                Vector3 horizontalVelocity = rb.velocity;
+                horizontalVelocity.y = 0;
+                if (playerInput.sprint == false)
                 {
-                    rb.velocity = horizontalVelocity.normalized * normalSpeed + Vector3.up * rb.velocity.y;
+                    if (horizontalVelocity.sqrMagnitude > normalSpeed * normalSpeed)
+                    {
+                        rb.velocity = horizontalVelocity.normalized * normalSpeed + Vector3.up * rb.velocity.y;
+                    }
+                }
+                else
+                {
+                    if (horizontalVelocity.sqrMagnitude > sprintSpeed * sprintSpeed)
+                    {
+                        rb.velocity = horizontalVelocity.normalized * sprintSpeed + Vector3.up * rb.velocity.y;
+                    }
                 }
             }
-            else
-            {
-                if (horizontalVelocity.sqrMagnitude > sprintSpeed * sprintSpeed)
-                {
-                    rb.velocity = horizontalVelocity.normalized * sprintSpeed + Vector3.up * rb.velocity.y;
-                }
-            }
+        }
+        else
+        {
+            forceDirection = Vector3.zero;
         }
     }
 
     private void LookAt()
     {
-        Vector3 direction = rb.velocity;
-        direction.y = 0f;
+        if (playerAttack.dodging == false)
+        {
+            Vector3 direction = rb.velocity;
+            direction.y = 0f;
 
-        if (inputDirection.sqrMagnitude > 0.1 && direction.sqrMagnitude > 0.1f)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
-            //this.rb.rotation = Quaternion.Slerp(transform.rotation, lookRotation, turnSmoothTime);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, turnSmoothTime);
+            if (inputDirection.sqrMagnitude > 0.1 && direction.sqrMagnitude > 0.1f)
+            {
+                Quaternion lookRotation = Quaternion.LookRotation(direction, Vector3.up);
+                //this.rb.rotation = Quaternion.Slerp(transform.rotation, lookRotation, turnSmoothTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, turnSmoothTime);
+            }
+            else
+            {
+                rb.angularVelocity = Vector3.zero;
+            }
         }
-        else
-        {
-            rb.angularVelocity = Vector3.zero;
-        }
+    }
+
+    public void ApplyDodgeForce(float dodge)
+    {
+        rb.AddForce(-transform.forward * dodge, ForceMode.Impulse);
     }
 }

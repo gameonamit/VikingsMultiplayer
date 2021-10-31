@@ -36,4 +36,14 @@ public class PlayerAnimation : MonoBehaviour
     {
         anim.SetTrigger("HeavyAttack");
     }
+
+    public void TriggerBlockAnimation()
+    {
+        anim.SetTrigger("Block");
+    }
+
+    public void TriggerDodgeAnimation()
+    {
+        anim.SetTrigger("Dodge");
+    }
 }
