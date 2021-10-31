@@ -4,18 +4,11 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public Transform target;
-    public float CameraMoveSpeed = 120f;
-    public float clampAngle = 80.0f;
-    public float inputSensitivity = 150.0f;
-    public GameObject CameraObj;
-    public GameObject PlayerObj;
-    public float camDistanceXToPlayer;
-    public float camDistanceYToPlayer;
-    public float camDistanceZToPlayer;
-    public float mouseX;
-    public float mouseY;
-    public float smoothX, smoothY;
+    [SerializeField] private Transform target;
+    [SerializeField] private float CameraMoveSpeed = 120f;
+    [SerializeField] private float clampAngle = 80.0f;
+    [SerializeField] private float inputSensitivity = 150.0f;
+    private float mouseX, mouseY;
     private float rotY = 0.0f;
     private float rotX = 0.0f;
 
@@ -28,13 +21,9 @@ public class CameraController : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void Update()
-    {
-        CameraLook();
-    }
-
     private void LateUpdate()
     {
+        CameraLook();
         CameraMovement();
     }
 

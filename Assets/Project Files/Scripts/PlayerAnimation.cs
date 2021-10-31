@@ -6,23 +6,34 @@ public class PlayerAnimation : MonoBehaviour
 {
     Animator anim;
     Rigidbody rb;
-    //CharacterController characterController;
-    PlayerController playerController;
 
     private void Awake()
     {
         anim = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody>();
-        playerController = GetComponent<PlayerController>();
-        //characterController = GetComponent<CharacterController>();
     }
 
     private void LateUpdate()
     {
-        Vector2 velocity = new Vector2(rb.velocity.x, rb.velocity.z);
-        float velocityMagnitude = velocity.magnitude;
-        anim.SetFloat("Velocity", velocityMagnitude);
+        if(rb.velocity.sqrMagnitude >= 0)
+            anim.SetFloat("Velocity", rb.velocity.sqrMagnitude);
+    }
 
-        anim.SetBool("IsGrounded", playerController.isGrounded);
+    public void TriggerAttackAnimation()
+    {
+        int ran = Random.Range(1, 5);
+        if(ran == 1)
+             anim.SetTrigger("Attack1");
+        else if(ran == 2)
+            anim.SetTrigger("Attack2");
+        else if (ran == 3)
+            anim.SetTrigger("Attack3");
+        else if (ran == 4)
+            anim.SetTrigger("Attack4");
+    }
+
+    public void TriggerHeavyAttackAnimation()
+    {
+        anim.SetTrigger("HeavyAttack");
     }
 }
