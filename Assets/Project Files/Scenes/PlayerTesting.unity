@@ -22441,6 +22441,8 @@ MonoBehaviour:
   sprint: 0
   attack: 0
   heavyAttack: 0
+  block: 0
+  dodge: 0
 --- !u!114 &1942978152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22466,8 +22468,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attacking: 0
+  blocking: 0
+  dodging: 0
+  dodgeForce: 5
   attackDelay: 1
   heavyAttackDelay: 1.5
+  blockingDelay: 0.5
+  dodgingDelay: 0.5
 --- !u!114 &1942978154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22480,7 +22487,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 223d4385738ed0a41a9518010d334e41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundDistance: 0.4
+  stepOffset: 0.25
+  stepForce: 3
+  stepYOffSet: 0.5
   turnSmoothTime: 0.2
   moveAcceleration: 1
   normalSpeed: 3

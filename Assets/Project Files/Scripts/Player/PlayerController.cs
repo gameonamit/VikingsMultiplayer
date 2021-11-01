@@ -13,8 +13,11 @@ public class PlayerController : MonoBehaviour
     private Vector3 forceDirection = Vector3.zero;
     private Vector2 inputDirection;
 
-    [Header("Grounded")]
-    [SerializeField] private float groundDistance = 0.25f;
+    [Header("Step Offset")]
+    [SerializeField] private float stepOffset = 0.25f;
+    [SerializeField] private float stepForce = 3f;
+    [SerializeField] private float stepYOffSet = 0.5f;
+    bool climbed = false;
 
     [Header("Rotation")]
     [SerializeField] private float turnSmoothTime = 0.1f;
@@ -39,15 +42,35 @@ public class PlayerController : MonoBehaviour
 
         GravityModifier();
         LookAt();
+
+        AutoClimb();
     }
 
-    private bool IsGrounded()
+    private void AutoClimb()
     {
-        Ray ray = new Ray(this.transform.position + Vector3.up * groundDistance, Vector3.down);
-        if (Physics.Raycast(ray, out RaycastHit hit, 0.3f))
-            return true;
-        else
-            return false;
+        if (inputDirection.sqrMagnitude > 0.1)
+        {
+            if (climbed == false)
+            {
+                //For Debugging
+                Debug.DrawLine(this.transform.position + new Vector3(0, stepYOffSet, 0),
+                this.transform.position + new Vector3(0, stepYOffSet, 0) + transform.forward * stepOffset, Color.red);
+
+                Ray ray = new Ray(this.transform.position + new Vector3(0, stepYOffSet, 0), transform.forward);
+                if (Physics.Raycast(ray, out RaycastHit hit, stepOffset))
+                {
+                    climbed = true;
+                    rb.AddForce(stepForce * transform.up, ForceMode.Impulse);
+                    StartCoroutine(ClimbReset());
+                }
+            }
+        }
+    }
+
+    IEnumerator ClimbReset()
+    {
+        yield return new WaitForSeconds(1f);
+        climbed = false;
     }
 
     private Vector3 GetCamerRight(Camera mainCamera)
