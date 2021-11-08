@@ -2,11 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable
 {
     public int CurrentHealth = 100;
-    public Slider healthSlider;
+    [SerializeField] private Slider healthSlider;
+    private Slider globalHealthSlider;
+
+    private void Start()
+    {
+        if (photonView.IsMine == true)
+        {
+            healthSlider.gameObject.SetActive(false);
+            globalHealthSlider = GameObject.FindGameObjectWithTag("HealthSlider").GetComponent<Slider>();
+        }
+    }
 
     public void IncreaseHealth(int value)
     {
@@ -15,7 +26,10 @@ public class PlayerHealth : MonoBehaviour
         {
             CurrentHealth = 100;
         }
-        UpdateUI();
+        if (photonView.IsMine == true)
+        {
+            photonView.RPC("UpdateUI", RpcTarget.All, CurrentHealth);
+        }
     }
 
     public void DecreaseHealth(int value)
@@ -25,11 +39,29 @@ public class PlayerHealth : MonoBehaviour
         {
             CurrentHealth = 0;
         }
-        UpdateUI();
+        if (photonView.IsMine == true)
+        {
+            photonView.RPC("UpdateUI", RpcTarget.All, CurrentHealth);
+        }
     }
 
-    private void UpdateUI()
+    [PunRPC]
+    private void UpdateUI(int cHealth)
     {
-        healthSlider.value = CurrentHealth;
+        healthSlider.value = cHealth;
+        if (globalHealthSlider != null)
+            globalHealthSlider.value = cHealth;
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(CurrentHealth);
+        }
+        else
+        {
+            CurrentHealth = (int)stream.ReceiveNext();
+        }
     }
 }

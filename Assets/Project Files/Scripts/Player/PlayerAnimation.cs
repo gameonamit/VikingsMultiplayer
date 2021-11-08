@@ -9,7 +9,7 @@ public class PlayerAnimation : MonoBehaviour
 
     private void Awake()
     {
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
     }
 
@@ -45,5 +45,15 @@ public class PlayerAnimation : MonoBehaviour
     public void TriggerDodgeAnimation()
     {
         anim.SetTrigger("Dodge");
+    }
+
+    public void TriggerHitAnimation()
+    {
+        anim.SetTrigger("Hit");
+    }
+
+    public void TriggerDeathAnimation()
+    {
+        anim.SetBool("Death", true);
     }
 }

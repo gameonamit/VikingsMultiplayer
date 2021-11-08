@@ -8,65 +8,113 @@ public class PlayerAttack : MonoBehaviour
     private PlayerInput playerInput;
     private PlayerAnimation playerAnimation;
     private PlayerController playerController;
+    private PlayerStamina playerStamina;
+    private PlayerHealth playerHealth;
+    private PlayerSoundEffects playerSoundEffects;
+
+    [SerializeField] AttackBox attackBox;
 
     public bool attacking = false;
     public bool blocking = false;
     public bool dodging = false;
 
+    Coroutine resetAttack;
+    Coroutine resetBlock;
+    Coroutine resetDouge;
+
+    [Header("Attack Damage")]
+    [SerializeField] int attackDamage = 5;
+    [SerializeField] int heavyAttackDamage = 8;
+
+    [Header("Attack Force")]
+    [SerializeField] float attackForce = 2f;
+    [SerializeField] float heavyAttackForce = 3f;
     [SerializeField] float dodgeForce = 5f;
 
+    [Header("Attack Delay")]
     [SerializeField] float attackDelay = 0.3f;
     [SerializeField] float heavyAttackDelay = 0.5f;
     [SerializeField] float blockingDelay = 0.5f;
     [SerializeField] float dodgingDelay = 0.5f;
+
+    [Header("Stamina Cost")]
+    [SerializeField] int attackStaminaCost = 10;
+    [SerializeField] int heavyAttackStaminaCost = 20;
+    [SerializeField] int blockingStaminaCost = 20;
+    [SerializeField] int dodgingStaminaCost = 20;
 
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
         playerAnimation = GetComponent<PlayerAnimation>();
         playerController = GetComponent<PlayerController>();
+        playerStamina = GetComponent<PlayerStamina>();
+        playerHealth = GetComponent<PlayerHealth>(); 
+        playerSoundEffects = GetComponent<PlayerSoundEffects>();
     }
 
     void Update()
     {
         if (playerInput.attack)
         {
-            if (attacking == false)
+            if (playerStamina.HasEnoughStamina(attackStaminaCost))
             {
-                attacking = true;
-                playerAnimation.TriggerAttackAnimation();
-                StartCoroutine(ResetAttact(attackDelay));
+                if (attacking == false)
+                {
+                    playerStamina.DecreaseStamina(attackStaminaCost);
+                    attacking = true;
+                    playerAnimation.TriggerAttackAnimation();
+                    playerController.ApplyForce(attackForce, transform.forward);
+                    if (resetAttack != null) StopCoroutine(resetAttack);
+                    resetAttack = StartCoroutine(ResetAttact(attackDelay));
+                }
             }
         }
 
         if (playerInput.heavyAttack)
         {
-            if (attacking == false)
+            if (playerStamina.HasEnoughStamina(heavyAttackStaminaCost))
             {
-                attacking = true;
-                playerAnimation.TriggerHeavyAttackAnimation();
-                StartCoroutine(ResetAttact(heavyAttackDelay));
+                if (attacking == false)
+                {
+                    attacking = true;
+                    playerStamina.DecreaseStamina(heavyAttackStaminaCost);
+                    playerAnimation.TriggerHeavyAttackAnimation();
+                    playerController.ApplyForce(heavyAttackForce, transform.forward);
+                    if (resetAttack != null) StopCoroutine(resetAttack);
+                    resetAttack = StartCoroutine(ResetAttact(heavyAttackDelay));
+                }
             }
         }
 
         if (playerInput.block)
         {
-            if (blocking == false)
+            if (playerStamina.HasEnoughStamina(blockingStaminaCost))
             {
-                blocking = true;
-                playerAnimation.TriggerBlockAnimation();
-                StartCoroutine(ResetBlock(blockingDelay));
+                if (blocking == false)
+                {
+                    blocking = true;
+                    playerStamina.DecreaseStamina(blockingStaminaCost);
+                    playerAnimation.TriggerBlockAnimation();
+                    if (resetBlock != null) StopCoroutine(resetBlock);
+                    resetBlock = StartCoroutine(ResetBlock(blockingDelay));
+                }
             }
         }
 
         if (playerInput.dodge)
         {
-            if (dodging == false)
+            if (playerStamina.HasEnoughStamina(dodgingStaminaCost))
             {
-                dodging = true;
-                playerAnimation.TriggerDodgeAnimation();
-                playerController.ApplyDodgeForce(dodgeForce);
-                StartCoroutine(ResetDodge(dodgingDelay));
+                if (dodging == false)
+                {
+                    dodging = true;
+                    playerStamina.DecreaseStamina(dodgingStaminaCost);
+                    playerAnimation.TriggerDodgeAnimation();
+                    playerController.ApplyForce(dodgeForce, -transform.forward);
+                    if (resetDouge != null) StopCoroutine(resetDouge);
+                    resetDouge = StartCoroutine(ResetDodge(dodgingDelay));
+                }
             }
         }
     }
@@ -88,4 +136,41 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSecondsRealtime(delay);
         dodging = false;
     }
+
+    #region Attack & Hit
+    public void Attack()
+    {
+        if (attackBox.inRange == true)
+        {
+            attackBox.otherPlayer.Hit(attackDamage);
+        }
+    }
+
+    public void HeavyAttack()
+    {
+        if (attackBox.inRange == true)
+        {
+            attackBox.otherPlayer.Hit(heavyAttackDamage);
+        }
+    }
+
+    public void Hit(int damage)
+    {
+        if(blocking == false)
+        {
+            playerHealth.DecreaseHealth(damage);
+            //Hit Animation
+            playerAnimation.TriggerHitAnimation();
+            if (playerHealth.CurrentHealth <= 0)
+            {
+                playerAnimation.TriggerDeathAnimation();
+                playerController.isDead = true;
+            }
+        }
+        else
+        {
+            playerSoundEffects.PlayBlockSFX();
+        }
+    }
+    #endregion
 }

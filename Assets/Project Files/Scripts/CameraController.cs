@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Transform target;
+    public Transform target;
     [SerializeField] private float CameraMoveSpeed = 120f;
     [SerializeField] private float minClampAngle = -80.0f;
     [SerializeField] private float maxClampAngle = 80.0f;
@@ -44,7 +44,10 @@ public class CameraController : MonoBehaviour
 
     private void CameraMovement()
     {
-        float step = CameraMoveSpeed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+        if (target != null)
+        {
+            float step = CameraMoveSpeed * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+        }
     }
 }

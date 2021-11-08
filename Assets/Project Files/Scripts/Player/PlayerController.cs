@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float normalSpeed;
     [SerializeField] private float sprintSpeed;
 
+    public bool isDead = false;
+
     private void Awake()
     {
         mainCamera = Camera.main;
@@ -37,13 +39,16 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CalculateDirection();
-        ApplyMovement();
+        if (isDead == false)
+        {
+            CalculateDirection();
+            ApplyMovement();
 
-        GravityModifier();
-        LookAt();
+            GravityModifier();
+            LookAt();
 
-        AutoClimb();
+            AutoClimb();
+        }
     }
 
     private void AutoClimb()
@@ -154,8 +159,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void ApplyDodgeForce(float dodge)
+    public void ApplyForce(float dodge, Vector3 direction)
     {
-        rb.AddForce(-transform.forward * dodge, ForceMode.Impulse);
+        rb.AddForce(direction * dodge, ForceMode.Impulse);
     }
 }
