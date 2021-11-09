@@ -56,4 +56,9 @@ public class PlayerAnimation : MonoBehaviour
     {
         anim.SetBool("Death", true);
     }
+
+    public void DisableDeathAnimation()
+    {
+        anim.SetBool("Death", false);
+    }
 }

@@ -9,6 +9,10 @@ public class PlayerController : MonoBehaviour
     private Camera mainCamera;
     private PlayerInput playerInput;
     private PlayerAttack playerAttack;
+    private PlayerRound playerRounds;
+    private PlayerHealth playerHealth;
+    private PlayerStamina playerStamina;
+    private PlayerAnimation playerAnimation;
 
     private Vector3 forceDirection = Vector3.zero;
     private Vector2 inputDirection;
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float sprintSpeed;
 
     public bool isDead = false;
+    private Vector3 defaultPosition;
 
     private void Awake()
     {
@@ -35,6 +40,15 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerInput = GetComponent<PlayerInput>();
         playerAttack = GetComponent<PlayerAttack>();
+        playerRounds = GetComponent<PlayerRound>();
+        playerHealth = GetComponent<PlayerHealth>();
+        playerStamina = GetComponent<PlayerStamina>();
+        playerAnimation = GetComponent<PlayerAnimation>();
+    }
+
+    private void Start()
+    {
+        defaultPosition = this.transform.position;
     }
 
     private void FixedUpdate()
@@ -162,5 +176,43 @@ public class PlayerController : MonoBehaviour
     public void ApplyForce(float dodge, Vector3 direction)
     {
         rb.AddForce(direction * dodge, ForceMode.Impulse);
+    }
+
+    public void ResetPlayerAfterTime(float time)
+    {
+        StartCoroutine(Co_ResetPlayerAfterTime(time));
+    }
+
+    IEnumerator Co_ResetPlayerAfterTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        ResetPlayer();
+        if (this.gameObject.CompareTag("Player"))
+        {
+            GameObject otherPlayer = GameObject.FindGameObjectWithTag("OtherPlayer");
+            otherPlayer.GetComponent<PlayerController>().ResetPlayer();
+        }
+        else
+        {
+            GameObject otherPlayer = GameObject.FindGameObjectWithTag("Player");
+            otherPlayer.GetComponent<PlayerController>().ResetPlayer();
+        }
+    }
+
+    public void ResetPlayer()
+    {
+        isDead = false;
+        transform.position = defaultPosition;
+        playerHealth.ResetHealth();
+        playerStamina.ResetStamina();
+        playerAnimation.DisableDeathAnimation();
+    }
+
+    public void Kill()
+    {
+        isDead = true;
+        ResetPlayerAfterTime(4f);
+        //Increase Rounds Here
+        playerRounds.IncreaseRounds();
     }
 }

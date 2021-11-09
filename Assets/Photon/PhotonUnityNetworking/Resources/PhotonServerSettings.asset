@@ -41,7 +41,14 @@ MonoBehaviour:
   - RespawnSpaceship
   - SynHealth
   - SynStamina
-  - UpdateUI
+  - ResetPlayerRPC
+  - UpdateHealthUI
+  - UpdateRoundsUI
+  - UpdateStaminaUI
+  - UpdateRoundTxt
+  - IncreaseAndUpdateRoundTxt
+  - UpdateRoundsTxt
+  - GameWonRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

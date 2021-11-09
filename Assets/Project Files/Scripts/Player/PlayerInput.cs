@@ -12,10 +12,16 @@ public class PlayerInput : MonoBehaviourPun
     public bool heavyAttack;
     public bool block;
     public bool dodge;
+    private LevelManager levelManager;
+
+    private void Awake()
+    {
+        levelManager = LevelManager.instance;
+    }
 
     void Update()
     {
-        if (photonView.IsMine == true)
+        if (photonView.IsMine == true && levelManager.isPaused == false)
         {
             Horizontal = Input.GetAxisRaw("Horizontal");
             Vertical = Input.GetAxisRaw("Vertical");

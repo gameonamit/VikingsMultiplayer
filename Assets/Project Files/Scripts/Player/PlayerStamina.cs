@@ -29,7 +29,7 @@ public class PlayerStamina : MonoBehaviourPunCallbacks, IPunObservable
                 CurrentStamina += autoFillSpeed * Time.deltaTime;
                 if (CurrentStamina >= 100) CurrentStamina = 100;
 
-                photonView.RPC("UpdateUI", RpcTarget.All, CurrentStamina);
+                photonView.RPC("UpdateStaminaUI", RpcTarget.All, CurrentStamina);
             }
         }
     }
@@ -52,7 +52,7 @@ public class PlayerStamina : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine == true)
         {
-            photonView.RPC("UpdateUI", RpcTarget.All, CurrentStamina);
+            photonView.RPC("UpdateStaminaUI", RpcTarget.All, CurrentStamina);
         }
     }
 
@@ -66,12 +66,21 @@ public class PlayerStamina : MonoBehaviourPunCallbacks, IPunObservable
 
         if (photonView.IsMine == true)
         {
-            photonView.RPC("UpdateUI", RpcTarget.All, CurrentStamina);
+            photonView.RPC("UpdateStaminaUI", RpcTarget.All, CurrentStamina);
+        }
+    }
+
+    public void ResetStamina()
+    {
+        CurrentStamina = 100;
+        if (photonView.IsMine == true)
+        {
+            photonView.RPC("UpdateStaminaUI", RpcTarget.All, CurrentStamina);
         }
     }
 
     [PunRPC]
-    public void UpdateUI(float cStamina)
+    public void UpdateStaminaUI(float cStamina)
     {
         staminaSlider.value = cStamina;
         if (globalStaminaSlider != null)

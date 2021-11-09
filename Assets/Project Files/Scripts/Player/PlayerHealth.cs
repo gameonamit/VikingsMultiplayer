@@ -8,7 +8,20 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable
 {
     public int CurrentHealth = 100;
     [SerializeField] private Slider healthSlider;
+    [SerializeField] private RectTransform healthBackBar;
+
     private Slider globalHealthSlider;
+    private RectTransform globalHealthBackBar;
+
+    private void Awake()
+    {
+        if (photonView.IsMine == false)
+        {
+            this.gameObject.tag = "OtherPlayer";
+            AudioListener audioListener = GetComponent<AudioListener>();
+            Destroy(audioListener);
+        }
+    }
 
     private void Start()
     {
@@ -16,6 +29,13 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable
         {
             healthSlider.gameObject.SetActive(false);
             globalHealthSlider = GameObject.FindGameObjectWithTag("HealthSlider").GetComponent<Slider>();
+            globalHealthBackBar = GameObject.FindGameObjectWithTag("HealthFillBack").GetComponent<RectTransform>();
+
+            globalHealthBackBar.anchorMax = globalHealthSlider.fillRect.anchorMax;
+            globalHealthBackBar.position = globalHealthSlider.fillRect.position;
+
+            healthBackBar.anchorMax = healthSlider.fillRect.anchorMax;
+            healthBackBar.position = healthSlider.fillRect.position;
         }
     }
 
@@ -28,7 +48,7 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable
         }
         if (photonView.IsMine == true)
         {
-            photonView.RPC("UpdateUI", RpcTarget.All, CurrentHealth);
+            photonView.RPC("UpdateHealthUI", RpcTarget.All, CurrentHealth);
         }
     }
 
@@ -39,18 +59,47 @@ public class PlayerHealth : MonoBehaviourPunCallbacks, IPunObservable
         {
             CurrentHealth = 0;
         }
+
         if (photonView.IsMine == true)
         {
-            photonView.RPC("UpdateUI", RpcTarget.All, CurrentHealth);
+            photonView.RPC("UpdateHealthUI", RpcTarget.All, CurrentHealth);
+        }
+    }
+
+    public void ResetHealth()
+    {
+        CurrentHealth = 100;
+        if (photonView.IsMine == true)
+        {
+            photonView.RPC("UpdateHealthUI", RpcTarget.All, CurrentHealth);
         }
     }
 
     [PunRPC]
-    private void UpdateUI(int cHealth)
+    private void UpdateHealthUI(int cHealth)
     {
         healthSlider.value = cHealth;
+        StartCoroutine(ResetHealthBackBar());
+
         if (globalHealthSlider != null)
+        {
             globalHealthSlider.value = cHealth;
+            StartCoroutine(ResetGlobalHealthBackBar());
+        }
+    }
+
+    IEnumerator ResetHealthBackBar()
+    {
+        yield return new WaitForSeconds(1f);
+        healthBackBar.anchorMax = healthSlider.fillRect.anchorMax;
+        healthBackBar.position = healthSlider.fillRect.position;
+    }
+
+    IEnumerator ResetGlobalHealthBackBar()
+    {
+        yield return new WaitForSeconds(1f);
+        globalHealthBackBar.anchorMax = globalHealthSlider.fillRect.anchorMax;
+        globalHealthBackBar.position = globalHealthSlider.fillRect.position;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

@@ -2,47 +2,109 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using Photon.Pun;
 
 public class PlayerRound : MonoBehaviourPunCallbacks, IPunObservable
 {
+    LevelManager levelManager;
+    Animator anim;
+
     Image[] roundUIGroupOne;
     Image[] roundUIGroupTwo;
+
+    TextMeshProUGUI roundTxt;
 
     [SerializeField] int RoundsToWinGame = 4;
     public int RoundsWon = 0;
 
+
     [SerializeField] Color disabledColor, leftColor, rightColor;
 
-    private void Start()
+    public bool isLeft = true;
+
+    [SerializeField] GameObject BjornSkin, KindHeraldSkin;
+    [SerializeField] Avatar BjornAvatar, KindHeraldAvatar;
+
+    private void Awake()
     {
         roundUIGroupOne = GameObject.FindGameObjectWithTag("LeftRoundUI").GetComponentsInChildren<Image>();
         roundUIGroupTwo = GameObject.FindGameObjectWithTag("RightRoundUI").GetComponentsInChildren<Image>();
+        roundTxt = GameObject.FindGameObjectWithTag("RoundTxt").GetComponent<TextMeshProUGUI>();
+        levelManager = FindObjectOfType<LevelManager>();
+        anim = GetComponent<Animator>();
+    }
 
+    private void Start()
+    {
         DisableRoundGroup(roundUIGroupOne);
         DisableRoundGroup(roundUIGroupTwo);
         // Disable all round UI on start
+
+        if (this.gameObject.CompareTag("Player"))
+        {
+            GameObject otherPlayer = GameObject.FindGameObjectWithTag("OtherPlayer");
+            if(otherPlayer == null)
+            {
+                isLeft = true;
+            }
+            else
+            {
+                isLeft = false;
+            }
+        }
+        else
+        {
+            GameObject otherPlayer = GameObject.FindGameObjectWithTag("Player");
+            if (otherPlayer == null)
+            {
+                isLeft = true;
+            }
+            else
+            {
+                isLeft = false;
+            }
+        }
+
+        if (isLeft)
+        {
+            BjornSkin.SetActive(true);
+            KindHeraldSkin.SetActive(false);
+            anim.avatar = BjornAvatar;
+        }
+        else
+        {
+            BjornSkin.SetActive(false);
+            KindHeraldSkin.SetActive(true);
+            anim.avatar = KindHeraldAvatar;
+        }
     }
 
     #region Round Increase & UI
     public void IncreaseRounds()
     {
         RoundsWon++;
+        levelManager.AddRounds();
         if (RoundsWon >= RoundsToWinGame)
         {
             //Game Won
+            photonView.RPC("GameWonRPC", RpcTarget.All, isLeft);
         }
 
-        if (photonView.IsMine == true)
-        {
-            photonView.RPC("UpdateUI", RpcTarget.All, RoundsWon);
-        }
+        photonView.RPC("UpdateRoundsUI", RpcTarget.All, RoundsWon);
+        photonView.RPC("UpdateRoundsTxt", RpcTarget.All, levelManager.CurrentRound);
     }
 
     [PunRPC]
-    public void UpdateUI(int rounds)
+    public void GameWonRPC(bool isLeft)
     {
-        if(photonView.IsMine == true)
+        levelManager.GameWon(isLeft);
+    }
+
+    [PunRPC]
+    public void UpdateRoundsUI(int rounds)
+    {
+        if (isLeft == true)
         {
             UpdateRoundUI(roundUIGroupOne, rounds, leftColor);
         }
@@ -50,6 +112,13 @@ public class PlayerRound : MonoBehaviourPunCallbacks, IPunObservable
         {
             UpdateRoundUI(roundUIGroupTwo, rounds, rightColor);
         }
+    }
+
+    [PunRPC]
+    public void UpdateRoundsTxt(int rounds)
+    {
+        levelManager.UpdateRounds(rounds);
+        roundTxt.text = levelManager.CurrentRound.ToString();
     }
     #endregion
 
@@ -66,7 +135,9 @@ public class PlayerRound : MonoBehaviourPunCallbacks, IPunObservable
         for(int i = 0; i < images.Length; i++)
         {
             if (i < cRound)
+            {
                 images[i].color = col;
+            }
         }
     }
 

@@ -11,6 +11,7 @@ public class PlayerAttack : MonoBehaviour
     private PlayerStamina playerStamina;
     private PlayerHealth playerHealth;
     private PlayerSoundEffects playerSoundEffects;
+    private PlayerRound playerRound;
 
     [SerializeField] AttackBox attackBox;
 
@@ -51,6 +52,7 @@ public class PlayerAttack : MonoBehaviour
         playerStamina = GetComponent<PlayerStamina>();
         playerHealth = GetComponent<PlayerHealth>(); 
         playerSoundEffects = GetComponent<PlayerSoundEffects>();
+        playerRound = GetComponent<PlayerRound>();
     }
 
     void Update()
@@ -142,7 +144,10 @@ public class PlayerAttack : MonoBehaviour
     {
         if (attackBox.inRange == true)
         {
-            attackBox.otherPlayer.Hit(attackDamage);
+            if (attackBox.otherPlayer.playerController.isDead == false)
+            {
+                attackBox.otherPlayer.Hit(attackDamage);
+            }
         }
     }
 
@@ -164,7 +169,7 @@ public class PlayerAttack : MonoBehaviour
             if (playerHealth.CurrentHealth <= 0)
             {
                 playerAnimation.TriggerDeathAnimation();
-                playerController.isDead = true;
+                playerController.Kill();
             }
         }
         else

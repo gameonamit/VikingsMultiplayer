@@ -19,7 +19,7 @@ public class PlayerSpawner : MonoBehaviour
 
     private IEnumerator SpawnPlayer()
     {
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.1f);
         GameObject[] players = GameObject.FindGameObjectsWithTag("OtherPlayer");
         GameObject player;
         if (players.Length <= 0)

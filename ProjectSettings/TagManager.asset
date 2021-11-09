@@ -9,6 +9,9 @@ TagManager:
   - HealthSlider
   - LeftRoundUI
   - RightRoundUI
+  - Bullet
+  - RoundTxt
+  - HealthFillBack
   layers:
   - Default
   - TransparentFX

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform target;
+    private LevelManager levelManager;
     [SerializeField] private float CameraMoveSpeed = 120f;
     [SerializeField] private float minClampAngle = -80.0f;
     [SerializeField] private float maxClampAngle = 80.0f;
@@ -12,6 +13,11 @@ public class CameraController : MonoBehaviour
     private float mouseX, mouseY;
     private float rotY = 0.0f;
     private float rotX = 0.0f;
+
+    private void Awake()
+    {
+        levelManager = LevelManager.instance;
+    }
 
     private void Start()
     {
@@ -24,8 +30,11 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        CameraLook();
-        CameraMovement();
+        if (levelManager.isPaused == false)
+        {
+            CameraLook();
+            CameraMovement();
+        }
     }
 
     private void CameraLook()
