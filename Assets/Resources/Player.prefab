@@ -7767,6 +7767,7 @@ GameObject:
   - component: {fileID: 8910719579915203458}
   - component: {fileID: 8910719579915203459}
   - component: {fileID: 8910719579915203456}
+  - component: {fileID: -6794493961882802793}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -8113,6 +8114,7 @@ MonoBehaviour:
   - {fileID: 8910719580263587002}
   - {fileID: 8910719579915203459}
   - {fileID: 8910719579915203456}
+  - {fileID: -6794493961882802793}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -8192,6 +8194,23 @@ MonoBehaviour:
     LayerIndex: 2
   - SynchronizeType: 1
     LayerIndex: 3
+--- !u!114 &-6794493961882802793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5875475241687418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c664f2881a2544f4684aa63d0a159f96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RoundsToWinGame: 4
+  RoundsWon: 0
+  disabledColor: {r: 0, g: 0, b: 0, a: 0.54901963}
+  leftColor: {r: 0.21333212, g: 0.8011444, b: 0.8867924, a: 1}
+  rightColor: {r: 0.8862745, g: 0.29890886, b: 0.2117647, a: 1}
 --- !u!1 &5875475244405985
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,6 +7,8 @@ TagManager:
   - OtherPlayer
   - StaminaSlider
   - HealthSlider
+  - LeftRoundUI
+  - RightRoundUI
   layers:
   - Default
   - TransparentFX
