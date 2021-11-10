@@ -12,10 +12,14 @@ public class LevelManager : MonoBehaviourPun
 
     [SerializeField] GameObject GameWonMenu;
     [SerializeField] TextMeshProUGUI GameWonTxt;
+    [SerializeField] TextMeshProUGUI InfoTxt;
+
+    private CameraController cameraController;
 
     private void Awake()
     {
         instance = this;
+        cameraController = FindObjectOfType<CameraController>();
     }
 
     public void AddRounds()
@@ -28,7 +32,7 @@ public class LevelManager : MonoBehaviourPun
         CurrentRound = rounds;
     }
 
-    public void GameWon(bool isleft)
+    public void GameWon(bool isleft, Vector3 camPositon, Quaternion camRotation)
     {
         GameWonMenu.SetActive(true);
         isPaused = true;
@@ -39,10 +43,14 @@ public class LevelManager : MonoBehaviourPun
         if (isleft)
         {
             GameWonTxt.text = "Bejohn Ironsite Won.";
+            InfoTxt.text = "He was a Norse Viking chief and legendary king of sweden who fought bravely for his country and brought honor to his country.";
         }
         else
         {
             GameWonTxt.text = "King Herald Won.";
+            InfoTxt.text = "His victory and success in unifying Norway earned Harald the achievement of becoming the first King of Norway and receiving the approval of Princess Gyda in marriage.";
         }
+
+        cameraController.AnimateToNewPosition(camPositon, camRotation);
     }
 }

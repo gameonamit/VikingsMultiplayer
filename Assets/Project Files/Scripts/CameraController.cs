@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour
     private float rotY = 0.0f;
     private float rotX = 0.0f;
 
+    private bool animating = false;
+
     private void Awake()
     {
         levelManager = LevelManager.instance;
@@ -30,7 +32,7 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (levelManager.isPaused == false)
+        if (levelManager.isPaused == false  && animating == false)
         {
             CameraLook();
             CameraMovement();
@@ -57,6 +59,26 @@ public class CameraController : MonoBehaviour
         {
             float step = CameraMoveSpeed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+        }
+    }
+
+    public void AnimateToNewPosition(Vector3 position, Quaternion rotation)
+    {
+        animating = true;
+        StartCoroutine(Co_AnimateToNewPosition(position, rotation));
+    }
+
+    private IEnumerator Co_AnimateToNewPosition(Vector3 position, Quaternion rotation)
+    {
+        while (animating)
+        {
+            yield return new WaitForEndOfFrame();
+            transform.position = Vector3.MoveTowards(transform.position, position, 5);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 5);
+            if(transform.position == position && transform.rotation == rotation)
+            {
+                animating = false;
+            }
         }
     }
 }

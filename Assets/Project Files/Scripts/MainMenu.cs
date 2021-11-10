@@ -5,14 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    [SerializeField] GameObject OptionsMenu;
+    [SerializeField] GameObject LobbyMenu;
+    [SerializeField] GameObject mainMenu;
+
     public void PlayGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        LobbyMenu.SetActive(true);
+        OptionsMenu.SetActive(false);
+        mainMenu.SetActive(false);
     }
 
     public void QuitGame()
     {
-        Debug.Log("QUIT");
         Application.Quit();
     }
 }

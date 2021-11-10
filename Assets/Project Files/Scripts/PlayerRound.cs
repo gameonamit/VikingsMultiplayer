@@ -26,6 +26,8 @@ public class PlayerRound : MonoBehaviourPunCallbacks, IPunObservable
     [SerializeField] GameObject BjornSkin, KindHeraldSkin;
     [SerializeField] Avatar BjornAvatar, KindHeraldAvatar;
 
+    [SerializeField] public Transform cinematicCameraTranform;
+
     private void Awake()
     {
         roundUIGroupOne = GameObject.FindGameObjectWithTag("LeftRoundUI").GetComponentsInChildren<Image>();
@@ -98,7 +100,29 @@ public class PlayerRound : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void GameWonRPC(bool isLeft)
     {
-        levelManager.GameWon(isLeft);
+        Transform otherPlayer;
+        Transform cinematicCamera;
+        if (isLeft)
+        {
+            otherPlayer = this.transform;
+            cinematicCamera = this.cinematicCameraTranform;
+        }
+        else
+        {
+            if (this.CompareTag("Player"))
+            {
+                otherPlayer = GameObject.FindGameObjectWithTag("OtherPlayer").transform;
+                cinematicCamera = otherPlayer.GetComponent<PlayerRound>().cinematicCameraTranform;
+            }
+            else
+            {
+                otherPlayer = GameObject.FindGameObjectWithTag("Player").transform;
+                cinematicCamera = otherPlayer.GetComponent<PlayerRound>().cinematicCameraTranform;
+            }
+        }
+        Vector3 position = otherPlayer.localPosition + cinematicCamera.localPosition;
+        Quaternion rotation = Quaternion.Euler(otherPlayer.eulerAngles + cinematicCamera.localRotation.eulerAngles);
+        levelManager.GameWon(isLeft, position, rotation);
     }
 
     [PunRPC]
